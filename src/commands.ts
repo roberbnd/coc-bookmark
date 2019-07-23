@@ -1,4 +1,4 @@
-import { workspace, Neovim } from 'coc.nvim'
+import { workspace, Neovim,Uri } from 'coc.nvim'
 import DB from './util/db'
 import { BookmarkItem, DocInfo } from './types'
 
@@ -10,7 +10,7 @@ export default class Bookmark {
     const lnum = await this.nvim.call('line', ['.'])
     const line = await this.nvim.line
     const filetype = doc.filetype
-    const filepath = doc.uri.replace('file://', '') // XXX
+    const filepath = Uri.parse(doc.uri).fsPath // XXX
     return { lnum, line, filetype, filepath }
   }
 
