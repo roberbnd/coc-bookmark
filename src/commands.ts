@@ -29,7 +29,8 @@ export default class Bookmark {
 
   public async annotate(): Promise<void> {
     const annotation = await workspace.requestInput('Annotation')
-    await this.create(annotation.trim())
+    if (annotation && annotation.trim())
+      await this.create(annotation.trim())
   }
 
   public async delete(): Promise<void> {
