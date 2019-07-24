@@ -31,10 +31,11 @@ export async function activate(context: ExtensionContext): Promise<void> {
   const sign = config.get<string>('sign', '⚑')
   const signFg = config.get<string>('signFg', '')
   const signBg = config.get<string>('signBg', '')
-  if (signFg && signBg)
-    await nvim.command(`hi BookMarkHI guifg=${signFg} guibg=${signBg}`)
-  else
-    await nvim.command('hi def link BookMarkHI Identifier')
+  await nvim.command('hi def link BookMarkHI Identifier')
+  if (signFg)
+    await nvim.command(`hi BookMarkHI guifg=${signFg}`)
+  if (signBg)
+    await nvim.command(`hi BookMarkHI guibg=${signBg}`)
   nvim.command(`sign define BookMark text=${sign} texthl=BookMarkHI`, true)
 
   workspace.onDidOpenTextDocument(async () => {
