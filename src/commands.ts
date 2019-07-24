@@ -1,8 +1,9 @@
-import { workspace, Neovim,Uri } from 'coc.nvim'
+import { workspace, Neovim, Uri } from 'coc.nvim'
 import DB from './util/db'
 import { BookmarkItem, DocInfo } from './types'
 
 export default class Bookmark {
+  private signCache: Set<number> = new Set()
   constructor(private nvim: Neovim, private db: DB) { }
 
   private async getDocInfo(): Promise<DocInfo> {
@@ -82,8 +83,16 @@ export default class Bookmark {
     const data = await this.db.load()
     const { filepath } = await this.getDocInfo()
     const bookmarks = data.get(filepath)
-    await this.nvim.command('sign unplace 2019')
+
     if (bookmarks) {
+      const signLnums = bookmarks.map(b => b.lnum)
+      for (const lnum of this.signCache) {
+        if (signLnums.indexOf(lnum) < 0) {
+          await this.nvim.command(`silent! sign unplace ${lnum}`)
+          this.signCache.clear()
+        }
+      }
+
       for (const bookmark of bookmarks) {
         const { lnum, line } = bookmark
         const currLine = await this.nvim.call('getline', [lnum])
@@ -91,8 +100,16 @@ export default class Bookmark {
           await this.db.delete(filepath, lnum)
           continue
         }
-        const cmd = `exe ":sign place 2019 line=${lnum} name=BookMark file=" . expand("%:p")`
+        const cmd = `exe ":sign place ${lnum} line=${lnum} name=BookMark file=" . expand("%:p")`
+        this.signCache.add(lnum)
         this.nvim.command(cmd, true)
+      }
+    } else {
+      if (this.signCache.size != 0) {
+        for (const lnum of this.signCache) {
+          await this.nvim.command(`silent! sign unplace ${lnum}`)
+          this.signCache.clear()
+        }
       }
     }
   }
