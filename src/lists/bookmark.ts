@@ -11,7 +11,7 @@ import DB from '../util/db'
 export default class BookmarkList extends BasicList {
   public readonly name = 'bookmark'
   public readonly description = 'bookmark'
-  public readonly defaultAction = 'delete'
+  public readonly defaultAction = 'open'
   public actions: ListAction[] = []
 
   constructor(protected nvim: Neovim, private db: DB) {
