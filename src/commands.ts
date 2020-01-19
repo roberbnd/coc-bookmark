@@ -11,7 +11,7 @@ export default class Bookmark {
     const lnum = await this.nvim.call('line', ['.'])
     const line = await this.nvim.line
     const filetype = doc.filetype
-    const filepath = Uri.parse(doc.uri).fsPath // XXX
+    const filepath = Uri.parse(doc.uri).fsPath
     return { lnum, line, filetype, filepath }
   }
 
@@ -25,7 +25,7 @@ export default class Bookmark {
       annotation
     }
 
-    this.db.add(bookmark, filepath)
+    await this.db.add(bookmark, filepath)
   }
 
   public async annotate(): Promise<void> {
@@ -52,7 +52,7 @@ export default class Bookmark {
     await this.create('')
   }
 
-  public async find(direction: string): Promise<void> {
+  public async find(direction: 'next' | 'prev'): Promise<void> {
     const data = await this.db.load()
     const { filepath, lnum } = await this.getDocInfo()
     const bookmark = data.get(filepath)
@@ -60,7 +60,7 @@ export default class Bookmark {
       if (direction === 'next') {
         for (const blnum of bookmark.map(b => b.lnum).sort())
           if (blnum > lnum) {
-            workspace.moveTo({
+            await workspace.moveTo({
               line: Math.max(blnum - 1, 0),
               character: 0
             })
@@ -69,7 +69,7 @@ export default class Bookmark {
       } else {
         for (const blnum of bookmark.map(b => b.lnum).sort().reverse())
           if (blnum < lnum) {
-            workspace.moveTo({
+            await workspace.moveTo({
               line: Math.max(blnum - 1, 0),
               character: 0
             })

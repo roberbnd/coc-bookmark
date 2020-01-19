@@ -1,7 +1,7 @@
 {
   "name": "coc-bookmark",
   "version": "1.0.2",
-  "description": "bookmark manager extension for coc.nvim",
+  "description": "Bookmark manager extension for coc.nvim",
   "main": "lib/index.js",
   "publisher": "voldikss",
   "keywords": [
@@ -59,24 +59,31 @@
       {
         "title": "create a new bookmark with annotation",
         "command": "bookmark.annotate"
+      },
+      {
+        "title": "jump to the prev bookmark",
+        "command": "bookmark.prev"
+      },
+      {
+        "title": "jump to the next bookmark",
+        "command": "bookmark.next"
       }
     ]
   },
   "author": "dyzplus@gmail.com",
   "license": "MIT",
   "devDependencies": {
-    "@chemzqm/tsconfig": "^0.0.3",
-    "@chemzqm/tslint-config": "^1.0.18",
-    "@octokit/rest": "^16.28.4",
-    "@types/node": "^12.0.10",
-    "@types/uuid": "^3.4.4",
-    "coc.nvim": "^0.0.73",
-    "rimraf": "^2.6.3",
-    "ts-loader": "^6.0.4",
-    "tslint": "^5.18.0",
-    "typescript": "^3.5.2",
-    "uuid": "^3.3.2",
-    "webpack": "^4.35.0",
-    "webpack-cli": "^3.3.5"
+    "@voldikss/tsconfig": "^1.0.0",
+    "@voldikss/tslint-config": "^1.0.6",
+    "@types/node": "^13.1.8",
+    "@types/uuid": "^3.4.6",
+    "coc.nvim": "^0.0.74",
+    "rimraf": "^3.0.0",
+    "ts-loader": "^6.2.1",
+    "tslint": "^5.20.1",
+    "typescript": "^3.7.5",
+    "uuid": "^3.4.0",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
   }
 }

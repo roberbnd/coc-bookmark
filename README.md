@@ -55,6 +55,8 @@ more information, see [package.json](https://github.com/voldikss/coc-bookmark/bl
 
 - `:CocCommand bookmark.toggle`: create/delete a bookmark
 - `:CocCommand bookmark.annotate`: create a bookmark with annotation
+- `:CocCommand bookmark.prev`: jump to the prev bookmark
+- `:CocCommand bookmark.next`: jump to the next bookmark
 
 ## Keymaps
 

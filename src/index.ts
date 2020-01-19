@@ -101,6 +101,20 @@ export async function activate(context: ExtensionContext): Promise<void> {
   )
 
   subscriptions.push(
+    commands.registerCommand(
+      'bookmark.prev',
+      async () => await bookmark.find('prev')
+    )
+  )
+
+  subscriptions.push(
+    commands.registerCommand(
+      'bookmark.next',
+      async () => await bookmark.find('next')
+    )
+  )
+
+  subscriptions.push(
     listManager.registerList(
       new BookmarkList(nvim, db)
     )
