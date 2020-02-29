@@ -37,15 +37,10 @@ Features as [vim-bookmarks](https://github.com/MattesGroeger/vim-bookmarks)
     "default": "⚑",
     "description": "Bookmark icon for sign column"
 },
-"bookmark.signFg": {
-    "type": "string",
-    "default": "",
-    "description": "foreground color of bookmark sign"
-},
-"bookmark.signBg": {
-    "type": "string",
-    "default": "",
-    "description": "background color of bookmark sign"
+"bookmark.signHi": {
+  "type": "string",
+  "default": "Identifier",
+  "description": "Highlight group for sign"
 }
 ```
 

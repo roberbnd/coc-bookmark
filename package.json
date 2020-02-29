@@ -39,15 +39,10 @@
           "default": "⚑",
           "description": "Bookmark icon for sign column"
         },
-        "bookmark.signFg": {
+        "bookmark.signHi": {
           "type": "string",
-          "default": "",
-          "description": "foreground color of bookmark sign"
-        },
-        "bookmark.signBg": {
-          "type": "string",
-          "default": "",
-          "description": "background color of bookmark sign"
+          "default": "Identifier",
+          "description": "Highlight group for sign"
         }
       }
     },
@@ -75,15 +70,15 @@
   "devDependencies": {
     "@voldikss/tsconfig": "^1.0.0",
     "@voldikss/tslint-config": "^1.0.6",
-    "@types/node": "^13.1.8",
-    "@types/uuid": "^3.4.6",
-    "coc.nvim": "^0.0.74",
-    "rimraf": "^3.0.0",
+    "@types/node": "^13.7.7",
+    "@types/uuid": "^7.0.0",
+    "coc.nvim": "^0.0.75",
+    "rimraf": "^3.0.2",
     "ts-loader": "^6.2.1",
-    "tslint": "^5.20.1",
-    "typescript": "^3.7.5",
-    "uuid": "^3.4.0",
-    "webpack": "^4.41.5",
-    "webpack-cli": "^3.3.10"
+    "tslint": "^6.0.0",
+    "typescript": "^3.8.3",
+    "uuid": "^7.0.1",
+    "webpack": "^4.41.6",
+    "webpack-cli": "^3.3.11"
   }
 }

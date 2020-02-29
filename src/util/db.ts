@@ -20,8 +20,9 @@ export default class DB {
     const map: BookmarkItemDB = new Map(JSON.parse(content))
     for (let p of map.keys()) {
       const s = await statAsync(p)
-      if (!s || !s.isFile())
+      if (!s || !s.isFile()) {
         map.delete(p)
+      }
     }
 
     return map as BookmarkItemDB
@@ -44,10 +45,12 @@ export default class DB {
     let bookmarks = items.get(path)
     if (bookmarks) {
       bookmarks = bookmarks.filter(b => b.lnum != lnum)
-      if (bookmarks.length === 0)  // no bookmarks in this path
+      if (bookmarks.length === 0) {  // no bookmarks in this path
         items.delete(path)
-      else
+      }
+      else {
         items.set(path, bookmarks)
+      }
       await writeFile(this.file, JSON.stringify([...items], null, 2))
     }
   }

@@ -30,8 +30,9 @@ export default class Bookmark {
 
   public async annotate(): Promise<void> {
     const annotation = await workspace.requestInput('Annotation')
-    if (annotation && annotation.trim())
+    if (annotation && annotation.trim()) {
       await this.create(annotation.trim())
+    }
   }
 
   public async delete(): Promise<void> {
@@ -58,7 +59,7 @@ export default class Bookmark {
     const bookmark = data.get(filepath)
     if (bookmark) {
       if (direction === 'next') {
-        for (const blnum of bookmark.map(b => b.lnum).sort())
+        for (const blnum of bookmark.map(b => b.lnum).sort()) {
           if (blnum > lnum) {
             await workspace.moveTo({
               line: Math.max(blnum - 1, 0),
@@ -66,8 +67,9 @@ export default class Bookmark {
             })
             return
           }
+        }
       } else {
-        for (const blnum of bookmark.map(b => b.lnum).sort().reverse())
+        for (const blnum of bookmark.map(b => b.lnum).sort().reverse()) {
           if (blnum < lnum) {
             await workspace.moveTo({
               line: Math.max(blnum - 1, 0),
@@ -75,6 +77,7 @@ export default class Bookmark {
             })
             return
           }
+        }
       }
     }
   }
