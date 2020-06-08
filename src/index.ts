@@ -26,25 +26,23 @@ export async function activate(context: ExtensionContext): Promise<void> {
   }
 
   const sign = config.get<string>('sign', '🔖')
-  const signHl = config.get<string>('signHl', 'Identifier')
-  nvim.command(`hi link Bookmark ${signHl}`, true)
-  nvim.command(`sign define BookMark text=${sign} texthl=Bookmark`, true)
+  const signHl = config.get<string>('signHl', 'Tag')
+  nvim.command(`hi link CocBookmarkSign ${signHl}`, true)
+  nvim.command(`sign define CocBookmark text=${sign} texthl=CocBookmarkSign`, true)
 
   workspace.onDidOpenTextDocument(async () => {
-    await bookmark.updateSign()
+    await bookmark.refresh()
   }, null, subscriptions)
 
-  workspace.onDidChangeTextDocument(async () => {
-    await bookmark.updateSign()
-  }, null, subscriptions)
+  // TODO: update bookmark if current buffer gets modified
+  // bookmark might be removed, or updated with **new line number**
+  // But coc's api does not supply sufficient info to detect which line was
+  // added(i.e. press key "o", to add one line, but we can not get it from the api)
 
-  events.on('CursorHold', async () => {
-    await bookmark.updateSign()
-  }, null, subscriptions)
-
-  events.on('BufEnter', async () => {
-    await bookmark.updateSign()
-  }, null, subscriptions)
+  // workspace.onDidChangeTextDocument(async e => {
+  //   workspace.showMessage(JSON.stringify(e.contentChanges))
+  //   await bookmark.update()
+  // }, null, subscriptions)
 
   subscriptions.push(
     workspace.registerKeymap(
@@ -66,7 +64,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
     workspace.registerKeymap(
       ['n'],
       'bookmark-next',
-      async () => await bookmark.find('next'),
+      async () => await bookmark.jumpTo('next'),
       { sync: false }
     ))
 
@@ -74,7 +72,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
     workspace.registerKeymap(
       ['n'],
       'bookmark-prev',
-      async () => await bookmark.find('prev'),
+      async () => await bookmark.jumpTo('prev'),
       { sync: false }
     ))
 
@@ -95,14 +93,28 @@ export async function activate(context: ExtensionContext): Promise<void> {
   subscriptions.push(
     commands.registerCommand(
       'bookmark.prev',
-      async () => await bookmark.find('prev')
+      async () => await bookmark.jumpTo('prev')
     )
   )
 
   subscriptions.push(
     commands.registerCommand(
       'bookmark.next',
-      async () => await bookmark.find('next')
+      async () => await bookmark.jumpTo('next')
+    )
+  )
+
+  subscriptions.push(
+    commands.registerCommand(
+      'bookmark.clearForCurrentFile',
+      async () => await bookmark.clear(false)
+    )
+  )
+
+  subscriptions.push(
+    commands.registerCommand(
+      'bookmark.clearForAllFiles',
+      async () => await bookmark.clear(true)
     )
   )
 

@@ -2,9 +2,7 @@
 
 Bookmark manager extension for [coc.nvim](https://github.com/neoclide/coc.nvim)
 
-Features as [vim-bookmarks](https://github.com/MattesGroeger/vim-bookmarks)
-
-![](https://user-images.githubusercontent.com/20282795/67162033-f0aaa200-f392-11e9-9421-edff0893fe60.png)
+![](https://user-images.githubusercontent.com/20282795/84043167-8a819680-a9d8-11ea-9f32-e980ff569a0d.png)
 
 ## Install
 
@@ -17,7 +15,6 @@ Features as [vim-bookmarks](https://github.com/MattesGroeger/vim-bookmarks)
 - Add/Delete a bookmark
 - Add annotation to a bookmark
 - Navigate bookmarks with CocList
-- Bookmark will be deleted if the line was changed
 
 ## Configuration
 
@@ -34,7 +31,7 @@ Features as [vim-bookmarks](https://github.com/MattesGroeger/vim-bookmarks)
 },
 "bookmark.signHl": {
   "type": "string",
-  "default": "Identifier",
+  "default": "Tag",
   "description": "Highlight group for sign"
 }
 ```
@@ -45,6 +42,8 @@ Features as [vim-bookmarks](https://github.com/MattesGroeger/vim-bookmarks)
 - `:CocCommand bookmark.annotate`: create a bookmark with annotation
 - `:CocCommand bookmark.prev`: jump to the prev bookmark
 - `:CocCommand bookmark.next`: jump to the next bookmark
+- `:CocCommand bookmark.clearForCurrentFile` clear bookmark for the current file",
+- `:CocCommand bookmark.clearForAllFiles` clear bookmark for all files",
 
 ## Keymaps
 
@@ -64,15 +63,39 @@ nmap <Leader>bk <Plug>(coc-bookmark-prev)
 run `:CocList bookmark` to open the bookmark
 
 - Filter your bookmarks and perform operations via `<Tab>`
+- Use `<CR` to jump to the marked file position
 - Use `preview` to preview the line you have marked
 - Use `delete` to delete a bookmark
-- Use `o` to jump to the marked line in the file
 
 ## F.A.Q
 
-Q: Where is the bookmark data stored?
+- Q: Where is the bookmark data stored?
 
-A: Normally the data is saved in `~/.config/coc/extensions/coc-bookmark-data`, but if you set `g:coc_extension_root` to another location, it will change as well
+  A: Normally the data is saved in `~/.config/coc/extensions/coc-bookmark-data`, but if you set `g:coc_extension_root` to another location, it will change as well
+
+- Q: The background of bookmark signs are not consistent with signcolumn...
+
+  A: change sign's background according to your colorschrme by putting the following code in your `vimrc`.
+
+  ```vim
+  function! s:my_bookmark_color() abort
+    let s:scl_guibg = matchstr(execute('hi SignColumn'), 'guibg=\zs\S*')
+    if empty(s:scl_guibg)
+      let s:scl_guibg = 'NONE'
+    endif
+    exe 'hi MyBookmarkSign guifg=' . s:scl_guibg
+  endfunction
+  call s:my_bookmark_color() " don't remove this line!
+
+  augroup UserGitSignColumnColor
+    autocmd!
+    autocmd ColorScheme * call s:my_bookmark_color()
+  augroup END
+  ```
+
+  Then set `bookmark.signHl` to `MyBookmarkSign` in your `coc-settings.json`.
+
+  The similar solution can be applied to other extensions/plugins sign color. For instance, see [solutions for git gutter sign](https://github.com/voldikss/dotfiles/blob/06d99c398933f6b9c024793252f2e6f8a25d9d22/home/.config/nvim/init.vim#L333-L355).
 
 ## License
 

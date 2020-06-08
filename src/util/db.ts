@@ -1,6 +1,7 @@
 import { statAsync, writeFile, readFile } from './io'
 import path from 'path'
 import { BookmarkItem, BookmarkItemDB } from '../types'
+import { ProvideOnTypeFormattingEditsSignature } from 'coc.nvim'
 
 export default class DB {
   private file: string
@@ -40,18 +41,27 @@ export default class DB {
     await writeFile(this.file, JSON.stringify([...items], null, 2))
   }
 
-  public async delete(path: string, lnum: number): Promise<void> {
+  // if no `lnum`, delete all bookmarks of the `path`
+  public async delete(path: string, lnum?: number): Promise<void> {
     const items = await this.load()
     let bookmarks = items.get(path)
     if (bookmarks) {
-      bookmarks = bookmarks.filter(b => b.lnum != lnum)
-      if (bookmarks.length === 0) {  // no bookmarks in this path
+      if (lnum != undefined) {
+        bookmarks = bookmarks.filter(b => b.lnum != lnum)
+        if (bookmarks.length === 0) {   // no bookmarks in this path
+          items.delete(path)
+        }
+        else {
+          items.set(path, bookmarks)
+        }
+      } else {
         items.delete(path)
-      }
-      else {
-        items.set(path, bookmarks)
       }
       await writeFile(this.file, JSON.stringify([...items], null, 2))
     }
+  }
+
+  public async clear(): Promise<void> {
+    await writeFile(this.file, JSON.stringify([], null, 2))
   }
 }

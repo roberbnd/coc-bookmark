@@ -36,7 +36,7 @@
         },
         "bookmark.signHl": {
           "type": "string",
-          "default": "Identifier",
+          "default": "Tag",
           "description": "Highlight group for sign"
         }
       }
@@ -57,6 +57,14 @@
       {
         "title": "jump to the next bookmark",
         "command": "bookmark.next"
+      },
+      {
+        "title": "clear bookmark for the current file",
+        "command": "bookmark.clearForCurrentFile"
+      },
+      {
+        "title": "clear bookmark for all files",
+        "command": "bookmark.clearForAllFiles"
       }
     ]
   },
