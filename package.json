@@ -24,11 +24,6 @@
     "configuration": {
       "type": "object",
       "properties": {
-        "bookmark.enable": {
-          "type": "boolean",
-          "default": true,
-          "description": "Whether to enable this extension"
-        },
         "bookmark.maxsize": {
           "type": "number",
           "default": 5000,
@@ -36,10 +31,10 @@
         },
         "bookmark.sign": {
           "type": "string",
-          "default": "⚑",
+          "default": "🔖",
           "description": "Bookmark icon for sign column"
         },
-        "bookmark.signHi": {
+        "bookmark.signHl": {
           "type": "string",
           "default": "Identifier",
           "description": "Highlight group for sign"

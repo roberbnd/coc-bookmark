@@ -22,11 +22,6 @@ Features as [vim-bookmarks](https://github.com/MattesGroeger/vim-bookmarks)
 ## Configuration
 
 ```jsonc
-"bookmark.enable": {
-    "type": "boolean",
-    "default": true,
-    "description": "Whether to enable this extension"
-},
 "bookmark.maxsize": {
     "type": "number",
     "default": 5000,
@@ -34,10 +29,10 @@ Features as [vim-bookmarks](https://github.com/MattesGroeger/vim-bookmarks)
 },
 "bookmark.sign": {
     "type": "string",
-    "default": "⚑",
+    "default": "🔖",
     "description": "Bookmark icon for sign column"
 },
-"bookmark.signHi": {
+"bookmark.signHl": {
   "type": "string",
   "default": "Identifier",
   "description": "Highlight group for sign"

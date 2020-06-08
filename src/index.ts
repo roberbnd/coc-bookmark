@@ -12,10 +12,6 @@ import Bookmark from './commands'
 
 export async function activate(context: ExtensionContext): Promise<void> {
   const config = workspace.getConfiguration('bookmark')
-  const enable = config.get<boolean>('enable', true)
-  if (!enable) {
-    return
-  }
 
   const { subscriptions, storagePath } = context
   const { nvim } = workspace
@@ -29,14 +25,10 @@ export async function activate(context: ExtensionContext): Promise<void> {
     await mkdirAsync(storagePath)
   }
 
-  const sign = config.get<string>('sign', '⚑')
-  const signHi = config.get<string>('signHi', 'Identifier')
-  if (signHi) {
-    await nvim.command(`hi link BookmarkTextDefHi ${signHi}`)
-  } else {
-    await nvim.command('hi link BookmarkTextDefHi Identifier')
-  }
-  nvim.command(`sign define BookMark text=${sign} texthl=BookmarkTextDefHi`, true)
+  const sign = config.get<string>('sign', '🔖')
+  const signHl = config.get<string>('signHl', 'Identifier')
+  nvim.command(`hi link Bookmark ${signHl}`, true)
+  nvim.command(`sign define BookMark text=${sign} texthl=Bookmark`, true)
 
   workspace.onDidOpenTextDocument(async () => {
     await bookmark.updateSign()
