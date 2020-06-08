@@ -1,7 +1,6 @@
 import { statAsync, writeFile, readFile } from './io'
 import path from 'path'
 import { BookmarkItem, BookmarkItemDB } from '../types'
-import { ProvideOnTypeFormattingEditsSignature } from 'coc.nvim'
 
 export default class DB {
   private file: string
@@ -35,7 +34,8 @@ export default class DB {
       items.delete([...items][0][0]) // TODO
     }
 
-    const bookmarks = items.get(path) || []
+    let bookmarks = items.get(path) || []
+    bookmarks = bookmarks.filter(d => d.lnum != data.lnum)
     bookmarks.push(data)
     items.set(path, bookmarks)
     await writeFile(this.file, JSON.stringify([...items], null, 2))
