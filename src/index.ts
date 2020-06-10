@@ -2,13 +2,12 @@ import {
   commands,
   ExtensionContext,
   listManager,
-  workspace,
-  events
-} from 'coc.nvim'
-import { mkdirAsync, statAsync } from './util/io'
-import DB from './util/db'
+  workspace} from 'coc.nvim'
+import { mkdirAsync, statAsync } from './util/fs'
 import BookmarkList from './lists/bookmark'
 import Bookmark from './commands'
+import path from 'path'
+import BookmarkDB from './util/db'
 
 export async function activate(context: ExtensionContext): Promise<void> {
   const config = workspace.getConfiguration('bookmark')
@@ -16,8 +15,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
   const { subscriptions, storagePath } = context
   const { nvim } = workspace
 
-  const maxsize = config.get<number>('maxsize', 5000)
-  const db = new DB(storagePath, 'bookmark', maxsize)
+  const db = new BookmarkDB(path.join(storagePath, 'bookmark.json'))
   const bookmark = new Bookmark(nvim, db)
 
   const stat = await statAsync(storagePath)
@@ -37,7 +35,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
   // TODO: update bookmark if current buffer gets modified
   // bookmark might be removed, or updated with **new line number**
   // But coc's api does not supply sufficient info to detect which line was
-  // added(i.e. press key "o", to add one line, but we can not get it from the api)
+  // added(i.e. press key "o", to add one line, but we can not get it from the api, can we???)
 
   // workspace.onDidChangeTextDocument(async e => {
   //   workspace.showMessage(JSON.stringify(e.contentChanges))

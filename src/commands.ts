@@ -1,66 +1,61 @@
 import { workspace, Neovim, Uri } from 'coc.nvim'
-import DB from './util/db'
-import { BookmarkItem, DocInfo } from './types'
+import BookmarkDB from './util/db'
 
 export default class Bookmark {
-  constructor(private nvim: Neovim, private db: DB) { }
+  private lnum: number
+  private line: string
+  private filetype: string
+  private filepath: string
+  constructor(private nvim: Neovim, private db: BookmarkDB) { }
 
-  private async getDocInfo(): Promise<DocInfo> {
+  private async getDocInfo(): Promise<void> {
+    // @XXX: to be improved
     const doc = await workspace.document
-    const lnum = (await this.nvim.call('line', ['.']))
-    const line = await this.nvim.line
-    const filetype = doc.filetype
-    const filepath = Uri.parse(doc.uri).fsPath
-    return { lnum, line, filetype, filepath }
+    this.lnum = (await this.nvim.call('line', ['.']))
+    this.line = await this.nvim.line
+    this.filetype = doc.filetype
+    this.filepath = Uri.parse(doc.uri).fsPath
   }
 
-  public async create(annotation: string): Promise<void> {
-    const { lnum, line, filetype, filepath } = await this.getDocInfo()
-    const bookmark: BookmarkItem = {
-      lnum,
-      line,
-      filetype,
-      annotation
-    }
-    await this.db.add(bookmark, filepath)
+  public async create(annotate?: string): Promise<void> {
+    const data: BookmarkItem = { line: this.line, filetype: this.filetype }
+    if (annotate) data.annotation = annotate
+    await this.db.push(`${encode(this.filepath)}.${this.lnum}`, data)
   }
 
   public async annotate(): Promise<void> {
     const annotation = await workspace.requestInput('Annotation')
     if (annotation && annotation.trim()) {
+      await this.getDocInfo()
       await this.create(annotation.trim())
+      await this.refresh()
     }
-    await this.refresh()
   }
 
   public async delete(): Promise<void> {
-    const { lnum, filepath } = await this.getDocInfo()
-    await this.db.delete(filepath, lnum)
+    await this.getDocInfo()
+    await this.db.delete(`${encode(this.filepath)}.${this.lnum}`)
     await this.refresh()
   }
 
   public async toggle(): Promise<void> {
-    const data = await this.db.load()
-    const { lnum, filepath } = await this.getDocInfo()
-    const bookmarks = data.get(filepath)
-    if (bookmarks) {
-      if (bookmarks.filter(b => b.lnum === lnum).length !== 0) {
-        await this.delete()
-        return
-      }
+    await this.getDocInfo()
+    const key = `${encode(this.filepath)}.${this.lnum}`
+    if (await this.db.exists(key)) {
+      await this.db.delete(key)
+    } else {
+      await this.create()
     }
-    await this.create('')
     await this.refresh()
   }
 
   public async jumpTo(direction: 'next' | 'prev'): Promise<void> {
-    const data = await this.db.load()
-    const { filepath, lnum } = await this.getDocInfo()
-    const bookmark = data.get(filepath)
+    await this.getDocInfo()
+    const bookmark = await this.db.fetch(encode(this.filepath))
     if (bookmark) {
       if (direction === 'next') {
-        for (const blnum of bookmark.map(b => b.lnum).sort()) {
-          if (blnum > lnum) {
+        for (const blnum of Object.keys(bookmark).map(lnum => Number(lnum)).sort()) {
+          if (blnum > this.lnum) {
             await workspace.moveTo({
               line: Math.max(blnum - 1, 0),
               character: 0
@@ -69,8 +64,8 @@ export default class Bookmark {
           }
         }
       } else {
-        for (const blnum of bookmark.map(b => b.lnum).sort().reverse()) {
-          if (blnum < lnum) {
+        for (const blnum of Object.keys(bookmark).map(lnum => Number(lnum)).sort().reverse()) {
+          if (blnum < this.lnum) {
             await workspace.moveTo({
               line: Math.max(blnum - 1, 0),
               character: 0
@@ -92,13 +87,11 @@ export default class Bookmark {
     await this.nvim.command(`silent! sign unplace * group=coc-bookmark buffer=${bufnr}`)
 
     // then add signs if exists
-    const data = await this.db.load()
-    const { filepath } = await this.getDocInfo()
-    const bookmarks = data.get(filepath)
-
+    await this.getDocInfo()
+    const bookmarks = await this.db.fetch(`${encode(this.filepath)}`)
     if (bookmarks) {
-      for (const bookmark of bookmarks) {
-        const { lnum } = bookmark
+      for (const lnumstr of Object.keys(bookmarks)) {
+        const lnum = Number(lnumstr)
         this.nvim.command(`sign place ${lnum} line=${lnum} name=CocBookmark group=coc-bookmark buffer=${bufnr}`, true)
       }
     }
@@ -107,14 +100,40 @@ export default class Bookmark {
   public async clear(all: boolean): Promise<void> {
     if (all) {
       await this.db.clear()
-      return
-    }
-    const data = await this.db.load()
-    const { filepath } = await this.getDocInfo()
-    const bookmark = data.get(filepath)
-    if (bookmark) {
-      await this.db.delete(filepath)
+    } else {
+      await this.getDocInfo()
+      await this.db.push(`${encode(this.filepath)}`, {})
+      await this.refresh()
     }
     await this.refresh()
   }
 }
+
+export function encode(filepath: string): string {
+  return encodeURIComponent(filepath).replace(/\./g, '%2E')
+}
+
+export function decode(text: string): string {
+  // dont need to replace "%2E" by "."
+  return decodeURIComponent(text)
+}
+
+export interface BookmarkItem {
+  line: string
+  filetype: string
+  annotation?: string
+}
+
+// bookmark data structure in bookmark.json
+/*
+ * {
+ *   file1: {
+ *       line1: BookmarkData,
+ *       line2: BookmarkData
+ *     },
+ *   file1: {
+ *     line1: BookmarkData,
+ *     line2: BookmarkData
+ *   }
+ * }
+ */

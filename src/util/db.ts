@@ -1,67 +1,103 @@
-import { statAsync, writeFile, readFile } from './io'
+// modified from https://github.com/neoclide/coc.nvim/blob/master/src/model/db.ts
 import path from 'path'
-import { BookmarkItem, BookmarkItemDB } from '../types'
+import { statAsync, writeFileAsync, readFileAsync, mkdirAsync } from './fs'
 
-export default class DB {
-  private file: string
+export default class BookmarkDB {
+  constructor(private readonly filepath: string) { }
 
-  constructor(
-    directory: string,
-    name: string,
-    private maxsize: number
-  ) {
-    this.file = path.join(directory, `${name}.json`)
+  public async load(): Promise<any> {
+    const dir = path.dirname(this.filepath)
+    const stat = await statAsync(dir)
+    if (!stat || !stat.isDirectory()) {
+      await mkdirAsync(dir)
+      await writeFileAsync(this.filepath, '{}')
+      return {}
+    }
+    try {
+      const content = await readFileAsync(this.filepath)
+      const data = JSON.parse(content.trim())
+      // former bookmark data structure is an array.
+      // so just clear them, sadly no other ways :(
+      if (Array.isArray(data)) throw new Error("Outdated bookmark format")
+      return data
+    } catch {
+      await writeFileAsync(this.filepath, '{}')
+      return {}
+    }
   }
 
-  public async load(): Promise<BookmarkItemDB> {
-    const stat = await statAsync(this.file)
-    if (!stat || !stat.isFile()) return new Map()
-    const content = await readFile(this.file)
-    const map: BookmarkItemDB = new Map(JSON.parse(content))
-    for (let p of map.keys()) {
-      const s = await statAsync(p)
-      if (!s || !s.isFile()) {
-        map.delete(p)
+  public async fetch(key: string): Promise<any> {
+    let obj = await this.load()
+    if (!key) return obj
+    let parts = key.split('.')
+    for (let part of parts) {
+      if (typeof obj[part] == 'undefined') {
+        return undefined
       }
+      obj = obj[part]
     }
-
-    return map as BookmarkItemDB
+    return obj
   }
 
-  public async add(data: BookmarkItem, path: string): Promise<void> {
-    let items = await this.load()
-    if (items.size == this.maxsize) {
-      items.delete([...items][0][0]) // TODO
+  public async exists(key: string): Promise<boolean> {
+    let obj = await this.load()
+    let parts = key.split('.')
+    for (let part of parts) {
+      if (typeof obj[part] == 'undefined') {
+        return false
+      }
+      obj = obj[part]
     }
-
-    let bookmarks = items.get(path) || []
-    bookmarks = bookmarks.filter(d => d.lnum != data.lnum)
-    bookmarks.push(data)
-    items.set(path, bookmarks)
-    await writeFile(this.file, JSON.stringify([...items], null, 2))
+    return true
   }
 
-  // if no `lnum`, delete all bookmarks of the `path`
-  public async delete(path: string, lnum?: number): Promise<void> {
-    const items = await this.load()
-    let bookmarks = items.get(path)
-    if (bookmarks) {
-      if (lnum != undefined) {
-        bookmarks = bookmarks.filter(b => b.lnum != lnum)
-        if (bookmarks.length === 0) {   // no bookmarks in this path
-          items.delete(path)
-        }
-        else {
-          items.set(path, bookmarks)
-        }
+  public async push(key: string, data: any): Promise<void> {
+    let origin = await this.load() || {}
+    let obj = origin
+    let parts = key.split('.')
+    let len = parts.length
+    if (obj == null) {
+      let dir = path.dirname(this.filepath)
+      await mkdirAsync(dir)
+      obj = origin
+    }
+    for (let i = 0; i < len; i++) {
+      let key = parts[i]
+      if (i == len - 1) {
+        obj[key] = data
+        await writeFileAsync(this.filepath, JSON.stringify(origin, null, 2))
+        break
+      }
+      if (typeof obj[key] == 'undefined') {
+        obj[key] = {}
+        obj = obj[key]
       } else {
-        items.delete(path)
+        obj = obj[key]
       }
-      await writeFile(this.file, JSON.stringify([...items], null, 2))
+    }
+  }
+
+  public async delete(key: string): Promise<void> {
+    let obj = await this.load()
+    let origin = obj
+    let parts = key.split('.')
+    let len = parts.length
+    for (let i = 0; i < len; i++) {
+      if (typeof obj[parts[i]] == 'undefined') {
+        break
+      }
+      if (i == len - 1) {
+        delete obj[parts[i]]
+        await writeFileAsync(this.filepath, JSON.stringify(origin, null, 2))
+        break
+      }
+      obj = obj[parts[i]]
     }
   }
 
   public async clear(): Promise<void> {
-    await writeFile(this.file, JSON.stringify([], null, 2))
+    let stat = await statAsync(this.filepath)
+    if (!stat || !stat.isFile()) return
+    await writeFileAsync(this.filepath, '{}')
   }
 }

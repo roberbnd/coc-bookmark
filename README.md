@@ -19,11 +19,6 @@ Bookmark manager extension for [coc.nvim](https://github.com/neoclide/coc.nvim)
 ## Configuration
 
 ```jsonc
-"bookmark.maxsize": {
-    "type": "number",
-    "default": 5000,
-    "description": "Maxsize of bookmark"
-},
 "bookmark.sign": {
     "type": "string",
     "default": "🔖",
@@ -96,6 +91,10 @@ run `:CocList bookmark` to open the bookmark
   Then set `bookmark.signHl` to `MyBookmarkSign` in your `coc-settings.json`.
 
   The similar solution can be applied to other extensions/plugins sign color. For instance, see [solutions for git gutter sign](https://github.com/voldikss/dotfiles/blob/06d99c398933f6b9c024793252f2e6f8a25d9d22/home/.config/nvim/init.vim#L333-L355).
+
+- Q: Other errors...
+
+  A: Might be the problem of incompatibilities in bookmark data structure, try `CocCommand bookmark.clearForAllFiles`.
 
 ## License
 

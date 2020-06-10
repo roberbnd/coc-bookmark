@@ -29,11 +29,6 @@
     "configuration": {
       "type": "object",
       "properties": {
-        "bookmark.maxsize": {
-          "type": "number",
-          "default": 5000,
-          "description": "Maxsize of bookmark"
-        },
         "bookmark.sign": {
           "type": "string",
           "default": "🔖",
