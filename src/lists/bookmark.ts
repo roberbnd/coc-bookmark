@@ -9,7 +9,7 @@ import {
 } from 'coc.nvim'
 import { Position } from 'vscode-languageserver-protocol'
 import BookmarkDB from '../util/db'
-import { decode, encode } from '../commands'
+import { decode, encode, BookmarkItem } from '../commands'
 
 export default class BookmarkList extends BasicList {
   public readonly name = 'bookmark'
@@ -36,11 +36,10 @@ export default class BookmarkList extends BasicList {
 
   public async loadItems(_context: ListContext): Promise<ListItem[]> {
     let items: ListItem[] = []
-    const data = await this.db.load()
+    const data = await this.db.load() as Object
     for (let [filepath, bookmarks] of Object.entries(data)) {
-      for (const [lnumstr, bookmark] of Object.entries(bookmarks)) {
-        filepath = decode(filepath)
-        let lnum = Number(lnumstr)
+      filepath = decode(filepath)
+      for (const [lnum, bookmark] of Object.entries(bookmarks) as [string, BookmarkItem][]) {
         items.push({
           label: `line: ${lnum} ${filepath} \t ${bookmark.annotation ? bookmark.annotation : ''}`,
           filterText: bookmark.annotation ? bookmark.annotation : '' + filepath,
@@ -48,8 +47,8 @@ export default class BookmarkList extends BasicList {
           location: {
             uri: Uri.file(filepath).toString(),
             range: {
-              start: { line: lnum - 1, character: 0 },
-              end: { line: lnum - 1, character: 0 },
+              start: { line: Number(lnum) - 1, character: 0 },
+              end: { line: Number(lnum) - 1, character: 0 },
             }
           }
         })
