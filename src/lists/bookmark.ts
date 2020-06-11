@@ -48,7 +48,7 @@ export default class BookmarkList extends BasicList {
       for (const lnum of Object.keys(bookmarks).sort((l1, l2) => Number(l1) - Number(l2))) {
         const bookmark: BookmarkItem = bookmarks[lnum]
         items.push({
-          label: `line: ${lnum} ${filepath} \t ${bookmark.annotation ? bookmark.annotation : ''}`,
+          label: `${filepath} line: ${lnum} \t ${bookmark.annotation ? bookmark.annotation : ''}`,
           filterText: bookmark.annotation ? bookmark.annotation : '' + filepath,
           data: Object.assign({}, { filepath, bookmark, lnum }),
           location: {
@@ -67,7 +67,7 @@ export default class BookmarkList extends BasicList {
   public doHighlight(): void {
     let { nvim } = this
     nvim.pauseNotification()
-    nvim.command('syntax match CocBookmarkLineNumber /^line: \\d\\+/', true)
+    nvim.command('syntax match CocBookmarkLineNumber /line: \\d\\+/', true)
     nvim.command('syntax match CocBookmarkAnnotation /\\t.*$/', true)
     nvim.command('syntax match CocBookmarkFilePath /^.\\{-}\\t/ contains=CocBookmarkLineNumber,CocBookmarkAnnotation', true)
     nvim.command('hi def link CocBookmarkLineNumber Special', true)
