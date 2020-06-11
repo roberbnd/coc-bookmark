@@ -53,8 +53,9 @@ export default class Bookmark {
     await this.getDocInfo()
     const bookmark = await this.db.fetch(encode(this.filepath))
     if (bookmark) {
+      const blnums = Object.keys(bookmark).map(lnum => Number(lnum)).sort((a, b) => a - b)
       if (direction === 'next') {
-        for (const blnum of Object.keys(bookmark).map(lnum => Number(lnum)).sort()) {
+        for (const blnum of blnums) {
           if (blnum > this.lnum) {
             await workspace.moveTo({
               line: Math.max(blnum - 1, 0),
@@ -64,7 +65,7 @@ export default class Bookmark {
           }
         }
       } else {
-        for (const blnum of Object.keys(bookmark).map(lnum => Number(lnum)).sort().reverse()) {
+        for (const blnum of blnums.reverse()) {
           if (blnum < this.lnum) {
             await workspace.moveTo({
               line: Math.max(blnum - 1, 0),
