@@ -2,7 +2,9 @@ import {
   commands,
   ExtensionContext,
   listManager,
-  workspace} from 'coc.nvim'
+  workspace,
+  events
+} from 'coc.nvim'
 import { mkdirAsync, statAsync } from './util/fs'
 import BookmarkList from './lists/bookmark'
 import Bookmark from './commands'
@@ -28,7 +30,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
   nvim.command(`hi link CocBookmarkSign ${signHl}`, true)
   nvim.command(`sign define CocBookmark text=${sign} texthl=CocBookmarkSign`, true)
 
-  workspace.onDidOpenTextDocument(async () => {
+  events.on('BufEnter', async () => {
     await bookmark.refresh()
   }, null, subscriptions)
 
