@@ -40,6 +40,10 @@ Bookmark manager extension for [coc.nvim](https://github.com/neoclide/coc.nvim)
 - `:CocCommand bookmark.clearForCurrentFile` clear bookmark for the current file",
 - `:CocCommand bookmark.clearForAllFiles` clear bookmark for all files",
 
+## User autocmd
+
+- `CocBookmarkChange`: triggered when creating/deleting a bookmark
+
 ## Keymaps
 
 - Normal mode: `<Plug>(coc-bookmark-next)`

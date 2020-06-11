@@ -29,6 +29,7 @@ export default class Bookmark {
       await this.getDocInfo()
       await this.create(annotation.trim())
       await this.refresh()
+      this.onChanged()
     }
   }
 
@@ -36,6 +37,7 @@ export default class Bookmark {
     await this.getDocInfo()
     await this.db.delete(`${encode(this.filepath)}.${this.lnum}`)
     await this.refresh()
+    this.onChanged()
   }
 
   public async toggle(): Promise<void> {
@@ -47,6 +49,7 @@ export default class Bookmark {
       await this.create()
     }
     await this.refresh()
+    this.onChanged()
   }
 
   public async jumpTo(direction: 'next' | 'prev'): Promise<void> {
@@ -104,9 +107,13 @@ export default class Bookmark {
     } else {
       await this.getDocInfo()
       await this.db.push(`${encode(this.filepath)}`, {})
-      await this.refresh()
     }
     await this.refresh()
+    this.onChanged()
+  }
+
+  private onChanged(): void {
+    this.nvim.command('doautocmd User CocBookmarkChange', true)
   }
 }
 
