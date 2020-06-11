@@ -10,6 +10,7 @@ import {
 import { Position } from 'vscode-languageserver-protocol'
 import BookmarkDB from '../util/db'
 import { decode, encode, BookmarkItem } from '../commands'
+import { statAsync } from '../util/fs'
 
 export default class BookmarkList extends BasicList {
   public readonly name = 'bookmark'
@@ -39,7 +40,10 @@ export default class BookmarkList extends BasicList {
     const data = await this.db.load() as Object
     for (let [filepath, bookmarks] of Object.entries(data)) {
       filepath = decode(filepath)
-      for (const [lnum, bookmark] of Object.entries(bookmarks) as [string, BookmarkItem][]) {
+      const stat = await statAsync(filepath)
+      if (!(stat && stat.isFile())) continue
+      for (const lnum of Object.keys(bookmarks).sort((l1, l2) => Number(l1) - Number(l2))) {
+        const bookmark: BookmarkItem = bookmarks[lnum]
         items.push({
           label: `line: ${lnum} ${filepath} \t ${bookmark.annotation ? bookmark.annotation : ''}`,
           filterText: bookmark.annotation ? bookmark.annotation : '' + filepath,
