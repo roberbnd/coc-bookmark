@@ -49,7 +49,7 @@ export default class BookmarkList extends BasicList {
         const bookmark: BookmarkItem = bookmarks[lnum]
         items.push({
           label: `${filepath} line: ${lnum} \t ${bookmark.annotation ? bookmark.annotation : ''}`,
-          filterText: bookmark.annotation ? bookmark.annotation : '' + filepath,
+          filterText: (bookmark.annotation ? bookmark.annotation : '') + filepath,
           data: Object.assign({}, { filepath, bookmark, lnum }),
           location: {
             uri: Uri.file(filepath).toString(),
