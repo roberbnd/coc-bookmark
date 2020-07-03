@@ -96,9 +96,9 @@ run `:CocList bookmark` to open the bookmark
 
   The similar solution can be applied to other extensions/plugins sign color. For instance, see [solutions for git gutter sign](https://github.com/voldikss/dotfiles/blob/06d99c398933f6b9c024793252f2e6f8a25d9d22/home/.config/nvim/init.vim#L333-L355).
 
-- Q: Other errors...
+- Q: Bookmark sign doesn't show for me
 
-  A: Might be the problem of incompatibilities in bookmark data structure, try `CocCommand bookmark.clearForAllFiles`.
+  A: [This](https://github.com/voldikss/coc-bookmark/issues/16#issuecomment-653420019) might be helpful.
 
 ## License
 
