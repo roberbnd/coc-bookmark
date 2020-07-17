@@ -27,8 +27,10 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
   const sign = config.get<string>('sign', '🔖')
   const signHl = config.get<string>('signHl', 'Tag')
-  nvim.command(`hi link CocBookmarkSign ${signHl}`, true)
-  nvim.command(`sign define CocBookmark text=${sign} texthl=CocBookmarkSign`, true)
+  if (sign != '') {
+    nvim.command(`hi link CocBookmarkSign ${signHl}`, true)
+    nvim.command(`sign define CocBookmark text=${sign} texthl=CocBookmarkSign`, true)
+  }
 
   events.on('BufEnter', async () => {
     await bookmark.refresh()
