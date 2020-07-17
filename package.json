@@ -1,11 +1,11 @@
 {
   "name": "coc-bookmark",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "Bookmark manager extension for coc.nvim",
   "main": "lib/index.js",
   "publisher": "voldikss",
   "repository": {
-    "url": "https://github.com/voldikss/coc-todolist"
+    "url": "https://github.com/voldikss/coc-bookmark"
   },
   "keywords": [
     "coc.nvim",
@@ -32,7 +32,7 @@
         "bookmark.sign": {
           "type": "string",
           "default": "🔖",
-          "description": "Bookmark icon for sign column"
+          "description": "Bookmark icon for sign column, set it to an empty string to disable sign icon"
         },
         "bookmark.signHl": {
           "type": "string",
